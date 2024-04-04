@@ -8,7 +8,7 @@ from models.place import Place
 from os import environ
 from flask import Flask, render_template
 import uuid
-app = Flask(__name__, template_folder='./')
+app = Flask(__name__, template_folder='templates')
 # app.jinja_env.trim_blocks = True
 # app.jinja_env.lstrip_blocks = True
 
