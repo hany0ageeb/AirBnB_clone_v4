@@ -10,6 +10,18 @@
     <link rel="icon" href="../static/images/icon.png" />
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="../static/scripts/3-hbnb.js?{{cache_id}}"></script>
+	<script type="text/javascript">
+		$(function(){
+			$.ajax('http://0.0.0.0:5001/api/v1/places_search/',{
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({}),
+				success: function(data){
+					alert(data);
+				},
+			});
+		});
+	</script>
     <title>HBnB</title>
   </head>
   <body>

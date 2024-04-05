@@ -13,8 +13,8 @@ $(function(){
 		}
 		$('.amenities>h4').html(amenities_names.join(', '));
 	});
-	$.get(status_url, (data, textStatus) => {
-		if (textStatus.toUpperCase() === 'OK') {
+	$.get(status_url, (data) => {
+		if (data.status === 'OK') {
 			$('div#api_status').removeClass('unavailable');
 			$('div#api_status').addClass('available');
 		} else {
@@ -22,12 +22,7 @@ $(function(){
 			$('div#api_status').addClass('unavailable');
 		}
 	});
-	$.post({
-		url: places_url,
-		data: {},
-		contentType: 'application/json',
-	}).done(function(response){
-		places = JSON.parse(response);
+	function addPlaces(places){
 		places.forEach((place) => {
 			let article = $('<articel><article>');
 			let titleBox = $(`<div class="title_box"></div>`);
@@ -43,7 +38,14 @@ $(function(){
 			article.append(user);
 			article.append($(`<div class="description"></div>`).text(`${place.description}`));
 			$('section.places').append(article);
-
 		});
+	}
+	$.ajax('http://0.0.0.0:5001/api/v1/places_search/',{
+		type: 'POST',
+		contentType: 'application/json',
+		data: JSON.stringify({}),
+		success: function(data){
+			addPlaces(data);
+		},
 	});
 });
