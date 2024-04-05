@@ -56,6 +56,13 @@ class Place(BaseModel, Base):
         """initializes Place"""
         super().__init__(*args, **kwargs)
 
+    def to_dict(self, save_fs=None):
+        """overriding to_dict()"""
+        dictionary = super().to_dict(save_fs)
+        if self.user is not None:
+            dictionary['user'] = self.user.to_dict()
+        return dictionary
+
     if models.storage_t != 'db':
         @property
         def reviews(self):
