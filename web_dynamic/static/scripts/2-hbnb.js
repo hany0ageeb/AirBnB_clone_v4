@@ -12,8 +12,8 @@ $(function(){
 		}
 		$('.amenities>h4').html(amenities_names.join(', '));
 	});
-	$.get(url, (data, textStatus) => {
-		if (textStatus.toUpperCase() === 'OK') {
+	$.get(url, (data) => {
+		if (data.status === 'OK') {
 			$('div#api_status').removeClass('unavailable');
 			$('div#api_status').addClass('available');
 		} else {
