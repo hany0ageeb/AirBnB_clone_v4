@@ -18,6 +18,9 @@ div#api_status {
     position: absolute;
     top: 25%;
 }
-div.unavailable {
+.unavailable {
     background-color: #cccccc;
+}
+.available {
+    background-color: #ff545f;
 }
