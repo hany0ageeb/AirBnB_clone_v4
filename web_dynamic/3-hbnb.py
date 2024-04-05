@@ -6,7 +6,7 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from os import environ
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, abort
 import uuid
 app = Flask(__name__, template_folder='templates')
 # app.jinja_env.trim_blocks = True
