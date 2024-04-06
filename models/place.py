@@ -39,6 +39,11 @@ class Place(BaseModel, Base):
         amenities = relationship("Amenity",
                                  secondary=place_amenity,
                                  viewonly=False)
+        @property
+        def amenity_ids(self):
+            """amenity_ids property getter"""
+            return [amenity.id for amenity in self.amenities]
+
     else:
         city_id = ""
         user_id = ""
@@ -61,6 +66,10 @@ class Place(BaseModel, Base):
         dictionary = super().to_dict(save_fs)
         if self.user is not None:
             dictionary['user'] = self.user.to_dict()
+        if self.reviews:
+            dictionary['reviews'] = [review.to_dict(save_fs) for review in self.reviews]
+        if self.amenities:
+            dictionary['amenities'] = [amenity.to_dict(save_fs) for amenity in self.amenities]
         return dictionary
 
     if models.storage_t != 'db':

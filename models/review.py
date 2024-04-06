@@ -22,3 +22,10 @@ class Review(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """initializes Review"""
         super().__init__(*args, **kwargs)
+
+    def to_dict(self, save_fs=None):
+        """override to_dict"""
+        dictionary = super().to_dict(save_fs)
+        if self.user:
+            dictionary['user'] = self.user.to_dict(save_fs)
+        return dictionary
