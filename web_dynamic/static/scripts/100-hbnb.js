@@ -17,89 +17,136 @@ $(function(){
 		}
 		$('.amenities>h4').html(amenities_names.join(', '));
 	});
-	$('ul#states-list input[type="checkbox"]').on('change', function(){
+	$('ul#states-list input[type="checkbox"]').on('change', function(event){
 		if(this.checked) {
-			states_ids.push($(this).attr('data-id'));
-			states_names.push($(this).attr('data-name'));
-
+			if (!states_ids.includes($(this).attr('data-id'))){
+				states_ids.push($(this).attr('data-id'));
+				states_names.push($(this).attr('data-name'));
+			}
 		} else {
 			states_ids.pop($(this).attr('data-id'));
-			states_name.pop($(this).attr('data-name'));
+			states_names.pop($(this).attr('data-name'));
 		}
+		$('.locations>h4').empty();
+		//$('.locations>h4').text(states_names.join(', ') + ", " +cities_names.join(', '));
 	});
-	$('ul#cities-list input[type="checkbox"]').on('change', function(){
-		if(this.checked) {
-			cities_ids.push($(this).attr('data-id'));
-			cities_names.push($(this).attr('data-name'));
+	$('ul#cities-list input[type=checkbox]').on('change', function(event){
+		event.stopPropagation();
+		if (this.checked) {
+			const dataId = $(this).attr('data-id');
+			if (!cities_ids.includes(dataId)){
+				cities_ids.push(dataId);
+				cities_names.push($(this).attr('data-name'));
+			}
 		} else {
 			cities_ids.pop($(this).attr('data-id'));
 			cities_names.pop($(this).attr('data-name'));
 		}
-		$('.locations>h4').html(states_names.join(', '));
+		$('.locations>h4').empty();
+		//$('.locations>h4').text(states_names.join(', ') + cities_names.join(', '));
 	});
-	$.get(status_url, (data, textStatus) => {
-		if (textStatus.toUpperCase() === 'OK') {
+	$.get(status_url, (data) => {
+		if (data.status === 'OK') {
 			$('div#api_status').removeClass('unavailable');
 			$('div#api_status').addClass('available');
+			$('.locations>h4').empty();
+			$('.locations>h4').text(states_names.join(', ') + cities_names.join(', '));
 		} else {
 			$('div#api_status').removeClass('available');
 			$('div#api_status').addClass('unavailable');
 		}
-		$('.lcations>4h').html(cities_names.join(', '));
 	});
-	$.post({
-		url: places_url,
-		data: {
-			states: states_ids,
-			cities: cities_ids,
-			amenities: amenities_ids
-		},
-		contentType: 'application/json',
-	}).done(function(response){
-		places = JSON.parse(response);
-		places.forEach((place) => {
-			let article = $('<articel><article>');
-			let titleBox = $(`<div class="title_box"></div>`);
-			titleBox.append($(`<h2></h2>`).text(place.name));
-			titleBox.append($(`<div class="price_by_night"></div>`).text(place.price_by_night));
-			article.append(titleBox);
-			let info = $(`<div class="information"></div>`);
-			info.append($(`<div class="max_guest"></div>`).text(`${place.max_guest} Guest(s)`));
-			info.append($(`<div class="number_rooms"></div>`).text(`${place.number_rooms} Bedroom(s)`));
-			info.append($(`<div class="number_bathrooms"></div>`).text(`${place.number_bathrooms} Bathroom(s)`));
-			article.append(info);
-			let user = $($(`<div class="user"><b>Owner:</b></div>`).text(`${place.user.first_name} ${place.user.last_name}`));
-			article.append(user);
-			article.append($(`<div class="description"></div>`).text(`${place.description}`));
-			$('section.places').append(article);
-
+	function addPlaces(places){
+		places.forEach(place => {
+			let article = jQuery('<article>');
+			let h2 = jQuery('<h2>');
+			h2.text(place.name);
+			let div = jQuery('<div>');
+			div.addClass("price_by_night");
+			div.text(`$${place.price_by_night}`);
+			article.append(h2);
+			article.append(div);
+			div = jQuery('<div>');
+			div.addClass("information");
+			let subDiv = jQuery('<div>');
+			subDiv.addClass("max_guest");
+			subDiv.text(`${place.max_guest} Guest(s)`);
+			div.append(subDiv);
+			subDiv = jQuery('<div>');
+			subDiv.addClass("number_rooms");
+			subDiv.text(`${place.number_rooms} Bedroom(s)`);
+			div.append(subDiv);
+			subDiv = jQuery('<div>');
+			subDiv.addClass("number_bathrooms");
+			subDiv.text(`${place.number_bathrooms} Bathroom(s)`);
+			div.append(subDiv);
+			article.append(div);
+			div = jQuery('<div>');
+			div.addClass("user");
+			div.text(`${place.user.first_name} ${place.user.last_name}`);
+			div.prepend('<b>Owner:</b> ');
+			article.append(div);
+			div= jQuery('<div>');
+			div.addClass("description");
+			let p = jQuery('<p>');
+			p.text(`${place.description}`);
+			div.append(p);
+			article.append(div);
+			if (place && place.amenities) {
+				div = jQuery('<div>');
+				div.addClass("amenities");
+				div.append('<h2>Amenities</h2>');
+				let ul = jQuery('<ul>');
+				place.amenities.forEach((amenity) => {
+					let li = jQuery('<li>');
+					li.text(`${amenity.name}`);
+					ul.append(li);
+				});
+				div.append(ul);
+				if (place.reviews) {
+					subDiv = jQuery('<div>');
+					subDiv.addClass("reviews");
+					subDiv.append(`<h2>${place.reviews.length} Reviews</h2>`);
+					ul = jQuery('<ul>');
+				
+					place.reviews.forEach((review) => {
+						let li = jQuery('<li>');
+						let h3 = jQuery('<h3>');
+						h3.text(`From ${review.user.first_name} ${review.user.last_name} ${(new Date(review.updated_at)).toDateString()}`);
+						let p = jQuery('<p>');
+						p.text(`${review.text}`);
+						li.append(h3);
+						li.append(p);
+						ul.append(li);
+					});
+					subDiv.append(ul);
+					div.append(subDiv);
+				}
+				article.append(div);
+			}
+			$('.places').append(article);
 		});
+	}
+	$.ajax(places_url,{
+		type: 'POST',
+		contentType: 'application/json',
+		data: JSON.stringify({}),
+		success: function(data){
+			addPlaces(data);
+		},
 	});
 	$('button').click(function(){
-		$.post({
-			url: places_url,
-			data: {
-				amenities: amenities_ids
-			},
+		$.ajax(places_url,{
+			type: 'POST',
 			contentType: 'application/json',
-		}).done(function(response){
-			places = JSON.parse(response);
-			places.forEach((place) => {
-				let article = $('<articel><article>');
-				let titleBox = $(`<div class="title_box"></div>`);
-				titleBox.append($(`<h2></h2>`).text(place.name));
-				titleBox.append($(`<div class="price_by_night"></div>`).text(place.price_by_night));
-				article.append(titleBox);
-				let info = $(`<div class="information"></div>`);
-				info.append($(`<div class="max_guest"></div>`).text(`${place.max_guest} Guest(s)`));
-				info.append($(`<div class="number_rooms"></div>`).text(`${place.number_rooms} Bedroom(s)`));
-				info.append($(`<div class="number_bathrooms"></div>`).text(`${place.number_bathrooms} Bathroom(s)`));
-				article.append(info);
-				let user = $($(`<div class="user"><b>Owner:</b></div>`).text(`${place.user.first_name} ${place.user.last_name}`));
-				article.append(user);
-				article.append($(`<div class="description"></div>`).text(`${place.description}`));
-				$('section.places').append(article);
-			});
+			data: JSON.stringify({
+				amenities: amenities_ids,
+				states: states_ids,
+				cities: cities_ids}),
+			success: function(data){
+				$('.places').empty();
+				addPlaces(data);
+			},
 		});
 	});
 });

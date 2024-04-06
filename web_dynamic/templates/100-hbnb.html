@@ -26,7 +26,7 @@
 	    <ul id="states-list">
 	      {% for state in states %}
 	      <li>
-		      <input type="checkbox" data-id="{{state[0].id}}" data-name="{{state[0].name}}"/> <h2>{{ state[0].name }}:</h2>
+		      <input type="checkbox" data-id="{{state[0].id}}" data-name="{{state[0].name}}"/> <h2 style="display: inline;">{{ state[0].name }}:</h2>
 		<ul id="cities-list">
 		  {% for city in state[1] %}
 		  <li><input type="checkbox" data-id="{{city.id}}" data-name="{{city.name}}"/>{{ city.name }}</li>
